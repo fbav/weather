@@ -1,5 +1,7 @@
 ## 5 day weather app
 
+The app displays the highest temperature for each day. Get more details by moving a mouse over the day.
+
 It is a prototype and as such has been built to run from a simple webserver e.g. Apache. As such it calls most of its libraries and dependencies externally when loaded in a browser. This is only for ease of use in this context. To run it locally either download the zip or the clone repo and add the files to a directory in your local webserver.
 Considerations for a production release and other improvements
 ###UX
