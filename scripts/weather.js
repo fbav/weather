@@ -136,28 +136,35 @@ var WeatherForecast = React.createClass({
 			});
 		}
 		
-		//We want to get the maximum temperature from the first day items 
-		var firstItem = this.state.weather[0];
-		if(firstItem){			
-			var firstMaxTemp = Utils.findMaxTemp(this.state.weather, this.state.weather[0].dt);
-		}
-		
-		//Let' display the highest remperature expected for the day		
-        var info = this.state.weather.map(function(data){
-			//Max temp for first day - we can't use time as a marker, because this set changes depending on the time of day. Items on the other days have a consistent set of items.
-			if(firstMaxTemp[firstMaxTemp.length - 1].dt === data.dt) {
-				return <WeatherItem key={data.id} dt={data.dt} date={data.dt_txt} maxTemp={data.maxTemp} minTemp={data.minTemp} description={data.description} icon={data.icon} weatherDetails={weatherDetails} currentId={currentId} onMouseOver={self.rollOver}/>
+		var info = <p>Loading forecast...</p>;
+		if(this.state.weather.length > 0){			
+			
+			var weatherArray = this.state.weather;
+			var maxTempArray = [];
+			var iter = 0;
+			
+			//use tail call optimised recursive function find maximum temperatures from each day
+			function findMaxTemps() {
+				function recur() {
+					if (maxTempArray.length < 5) {
+						var maxItem = Utils.findMaxTemp(weatherArray, weatherArray[iter].dt);
+						maxTempArray.push(maxItem[maxItem.length - 1]);
+						iter = maxItem[0].id + maxItem.length;
+						return recur();
+					} else {
+						return maxTempArray;
+					}
+				}
+
+				return recur();
 			}
 			
-			//We assume for the [urpose of this exercise that the maximum temperature for the day happens at 15:00 Stanadard time or 16:00 Summer time]
-			else if(data.dt_txt.includes("15:00:00") && data.id > firstMaxTemp.length){
+			findMaxTemps();
+			
+			info = maxTempArray.map(function(data){
 				return <WeatherItem key={data.id} dt={data.dt} date={data.dt_txt} maxTemp={data.maxTemp} minTemp={data.minTemp} description={data.description} icon={data.icon} weatherDetails={weatherDetails} currentId={currentId} onMouseOver={self.rollOver}/>
-			}            
-        });
-
-        if(!info.length){
-            info = <p>Loading forecast...</p>;
-        }		
+			});
+		}	
 
         return (
             <div>
